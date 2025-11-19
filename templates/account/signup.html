@@ -1,0 +1,87 @@
+{% load i18n allauth socialaccount static widget_tweaks %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Create Account</title>
+
+    <link rel="stylesheet" href="{% static 'assets/css/libs.bundle.css' %}"/>
+    <link rel="stylesheet" href="{% static 'assets/css/theme.bundle.css' %}"/>
+</head>
+
+<body class="bg-light">
+
+<section class="mt-0 overflow-hidden vh-100 d-flex justify-content-center align-items-center p-4">
+
+    <div class="col-12 col-md-8 col-lg-6 col-xxl-5">
+
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold fs-3 d-flex justify-content-center mb-4" href="/">
+            <div class="d-flex align-items-center">
+                <svg class="f-w-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 77.53 72.26">
+                    <path d="M10.43,54.2h0L0,36.13,10.43,18.06,20.86,0H41.72L10.43,54.2Zm67.1-7.83L73,54.2,68.49,62,45,48.47,31.29,72.26H20.86l-5.22-9L52.15,0H62.58l5.21,9L54.06,32.82,77.53,46.37Z"
+                          fill="currentColor" fill-rule="evenodd"/>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Card -->
+        <div class="shadow-xl p-4 p-lg-5 bg-white rounded-3">
+
+            <h1 class="text-center mb-5 fs-2 fw-bold">Open Your Account</h1>
+
+            <!-- Google Login -->
+            {% if SOCIALACCOUNT_ENABLED %}
+            <a href="{% provider_login_url 'google' %}" class="btn btn-danger w-100 mb-3 py-2">
+                <i class="ri-google-fill align-bottom"></i> Sign in with Google
+            </a>
+            {% endif %}
+
+            <div class="text-center text-muted fw-bold my-3">OR</div>
+
+            {% url 'account_signup' as action_url %}
+            <form method="post" action="{{ action_url }}">
+                {% csrf_token %}
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    {% render_field form.email class="form-control form-control" placeholder="Enter email" %}
+                    <small class="text-danger">{{ form.email.errors }}</small>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    {% render_field form.password1 class="form-control form-control" placeholder="Enter password" %}
+                    <small class="text-danger">{{ form.password1.errors }}</small>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    {% render_field form.password2 class="form-control form-control" placeholder="Confirm password" %}
+                    <small class="text-danger">{{ form.password2.errors }}</small>
+                </div>
+
+                {{ redirect_field }}
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-dark w-100 py-2 fs-5 mt-2">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-muted mt-3">
+                Already have an account?
+                <a href="{{ login_url }}" class="fw-bold">Login here</a>
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+</body>
+</html>
