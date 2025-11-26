@@ -4,6 +4,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Login</title>
 
     <link rel="stylesheet" href="{% static 'assets/css/libs.bundle.css' %}"/>
@@ -33,9 +35,9 @@
 
             <!-- Google Login Button -->
             {% if SOCIALACCOUNT_ENABLED %}
-            <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-danger w-100 mb-3 py-2">
-                <i class="ri-google-fill align-bottom"></i> Sign in with Google
-            </a>
+                <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-danger w-100 mb-3 py-2">
+                    <i class="ri-google-fill align-bottom"></i> Sign in with Google
+                </a>
             {% endif %}
 
             <div class="text-center text-muted fw-bold my-3">OR</div>
@@ -57,7 +59,6 @@
                     <small class="text-danger">{{ form.password.errors }}</small>
                 </div>
 
-              
 
                 {{ redirect_field }}
 

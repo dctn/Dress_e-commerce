@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
+    'cart.apps.CartConfig',
+    'payment.apps.PaymentConfig',
 
     'allauth',
     'django.contrib.sites',
@@ -80,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
+                'cart.context_processor.get_cart'
             ],
         },
     },
@@ -133,6 +136,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -142,6 +148,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
 LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGIN_CANCEL_REDIRECT_URL = '/'
+ACCOUNT_SOCIALACCOUNT_LOGIN_CANCELLED_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -158,3 +166,6 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+RAZORPAY_KEY = "rzp_test_RkJ7bPmJPdSWj7"
+RAZORPAY_SECRET = "gBY0nPQUrfAS4mDHcrT085L2"

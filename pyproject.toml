@@ -8,6 +8,8 @@ dependencies = [
     "django>=5.2.8",
     "django-allauth>=65.13.0",
     "django-widget-tweaks>=1.5.0",
+    "pillow>=12.0.0",
     "pyjwt>=2.10.1",
+    "razorpay>=2.0.0",
     "requests>=2.32.5",
 ]
