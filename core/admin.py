@@ -29,7 +29,7 @@ class VariantProductAdminForm(forms.ModelForm):
 @admin.register(VariantProduct)
 class VariantProductAdmin(admin.ModelAdmin):
     form = VariantProductAdminForm  # 👈 IMPORTANT
-    list_display = ("base_product", "color_name", "price_value", "is_discount", "discount_price","price_per_inches")
+    list_display = ("base_product", "color_name", "price_value", "is_discount", "discount_price","price_per_inches","sale")
 
     def color_name(self, obj):
         return obj.color.name

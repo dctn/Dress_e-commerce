@@ -38,6 +38,12 @@ class Cart:
             })
         return items
 
+    def total_amount(self):
+        total = 0
+        for item in self.all_products():
+            total += item['product_price'] * item['qty']
+
+        return total
 
     def __len__(self):
         total_qty = 0
@@ -52,3 +58,9 @@ class Cart:
             del self.cart[product]
             self.session.modified = True
         return None
+
+    def clear(self):
+        self.cart = {}
+        self.session['cart'] = {}
+        self.session.modified = True
+

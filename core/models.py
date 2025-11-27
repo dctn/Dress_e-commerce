@@ -41,6 +41,9 @@ class VariantProduct(models.Model):
 
     price = models.FloatField(blank=True, null=True)
     stock = models.IntegerField()
+    sale = models.IntegerField(blank=True, null=True, editable=False,default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_discount = models.BooleanField(default=False)
     discount_price = models.FloatField(blank=True, null=True)
 

@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r7qh-9cb8r)7e^gf7x8gnq1pa&mc@@%m(%=+^)ozj)j%etq226'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -100,6 +103,16 @@ DATABASES = {
     }
 }
 
+import dj_database_url
+
+if os.environ.get('ENVIRONMENT') == "production":
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL")
+        )
+    }
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -167,5 +180,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-RAZORPAY_KEY = "rzp_test_RkJ7bPmJPdSWj7"
-RAZORPAY_SECRET = "gBY0nPQUrfAS4mDHcrT085L2"
+RAZOR_PAY_CALLBACK_URL = "payment_verify"
+
+RAZORPAY_KEY = os.environ.get("RAZORPAY_KEY")
+RAZORPAY_SECRET = os.environ.get("RAZORPAY_SECRET")

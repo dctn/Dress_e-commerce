@@ -78,7 +78,7 @@
         </div>
         <div class="col-2">
             <p>Home / T-Shirt</p>
-            <h1 class="product-title" style="word-wrap: break-word">{{ product.base_product.name }}</h1>
+                <h1 class="product-title" style="word-wrap: break-word">{{ product.base_product.name }}</h1>
 
             {% for tag in product.tag.all %}
                 <a href="{% url 'products_filter_tag' tag.name %}" class="page-btn"

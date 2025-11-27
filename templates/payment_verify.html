@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    {% include 'includes/nav.html' %}
+  <div class="container my-5 d-flex justify-content-center">
+    <div class="card p-4 shadow-lg" style="max-width: 550px; width: 100%;">
+        <div class="text-center">
+            <i class="ri-check-line text-success" style="font-size: 60px;"></i>
+            <h2 class="fw-bold text-success mt-3">{{ status }}</h2>
+
+            <h5 class="mt-3">
+                Please note your tracking ID:
+                <span class="text-danger fw-bold">{{ order_id }}</span>
+            </h5>
+
+            <p class="text-muted mt-3">
+                Use this ID to track your order status and payment confirmation.
+            </p>
+
+            <a href="{% url 'index' %}" class="btn btn-dark mt-3 px-4">Go to Home</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

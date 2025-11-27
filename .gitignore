@@ -118,7 +118,7 @@ venv.bak/
 *.stTheme.cache 
 *.sublime-workspace 
 *.sublime-project 
-
+TODO.md
 # sftp configuration file 
 sftp-config.json 
 
