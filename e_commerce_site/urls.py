@@ -28,4 +28,9 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Only serve media files with runserver when MEDIA_URL is a local path
+    # (i.e., starts with '/'). When using remote storage (DigitalOcean Spaces)
+    # MEDIA_URL will be a full URL like 'https://bucket.region.digitaloceanspaces.com/'
+    media_url = getattr(settings, 'MEDIA_URL', '')
+    if isinstance(media_url, str) and media_url.startswith('/'):
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

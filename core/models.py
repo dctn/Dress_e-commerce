@@ -33,10 +33,10 @@ class VariantProduct(models.Model):
     base_product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE,related_name='variants')
     color = models.ForeignKey(Color, on_delete=models.CASCADE,related_name='variants')
     tag = models.ManyToManyField(Tag,related_name='variants')
-    image_1 = models.ImageField(upload_to='product_images/')
-    image_2 = models.ImageField(blank=True, null=True, upload_to='product_images/')
-    image_3 = models.ImageField(blank=True, null=True, upload_to='product_images/')
-    image_4 = models.ImageField(blank=True, null=True, upload_to='product_images/')
+    image_1 = models.ImageField(upload_to='e_commerce/product_images/')
+    image_2 = models.ImageField(blank=True, null=True, upload_to='e_commerce/product_images/')
+    image_3 = models.ImageField(blank=True, null=True, upload_to='e_commerce/product_images/')
+    image_4 = models.ImageField(blank=True, null=True, upload_to='e_commerce/product_images/')
 
 
     price = models.FloatField(blank=True, null=True)

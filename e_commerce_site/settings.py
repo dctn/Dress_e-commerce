@@ -49,10 +49,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     'widget_tweaks',
+
+    'storages',
+    # 'django_cleanup.apps.CleanupConfig',
 ]
 
 SITE_ID = 1
-
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -103,15 +105,6 @@ DATABASES = {
     }
 }
 
-import dj_database_url
-
-if os.environ.get('ENVIRONMENT') == "production":
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL")
-        )
-    }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -149,14 +142,14 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
@@ -184,3 +177,96 @@ RAZOR_PAY_CALLBACK_URL = "payment_verify"
 
 RAZORPAY_KEY = os.environ.get("RAZORPAY_KEY")
 RAZORPAY_SECRET = os.environ.get("RAZORPAY_SECRET")
+
+
+# storage
+
+# Toggle whether to use DigitalOcean Spaces (S3) storage backend.
+# Useful for enabling Spaces in development: set USE_SPACES=1 in your .env
+USE_SPACES = os.environ.get('USE_SPACES', '').lower() in ('1', 'true', 'yes')
+
+# Use DigitalOcean Spaces if ENVIRONMENT==production or USE_SPACES is enabled
+if os.environ.get('ENVIRONMENT') == 'production' or USE_SPACES:
+    # ========= DigitalOcean Spaces Storage ========= #
+    # Configure storages using the Django 5.x `STORAGES` setting so the
+    # StorageHandler can create the correct backend.
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    # Prefix inside the bucket where media files will be stored. You can
+    # override it with AWS_S3_LOCATION in .env, otherwise default to
+    # the project folder name so objects go under that prefix in the Space.
+    AWS_S3_LOCATION = "media"
+
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "location": AWS_S3_LOCATION,
+            },
+        },
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
+
+    # Allow overriding endpoint from env (useful for local testing or explicit endpoints)
+    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL") or f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN") or f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+
+    # For django-storages >=1.13: you can choose to set ACL headers or
+    # configure a bucket policy that grants public read access. By default
+    # we avoid sending ACL headers (safer when bucket policy controls access).
+    # If you want uploaded objects to be publicly readable via Spaces,
+    # set SPACES_PUBLIC=1 in your .env — this will set the ACL to public-read.
+    SPACES_PUBLIC = os.environ.get('SPACES_PUBLIC', '').lower() in ('1', 'true', 'yes')
+    if SPACES_PUBLIC:
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            "CacheControl": "max-age=86400",
+        }
+    else:
+        AWS_DEFAULT_ACL = None
+        AWS_S3_OBJECT_PARAMETERS = {
+            "CacheControl": "max-age=86400",
+        }
+
+    AWS_S3_ADDRESSING_STYLE = "virtual"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+
+    # Point MEDIA_URL to the location prefix so URLs use the folder in the Space
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+    MEDIA_ROOT = ""
+
+    
+    try:
+        from django.core.files.storage import default_storage
+        # Try to instantiate the S3 storage backend now so default_storage
+        # won't remain uninitialized (None) and cause AttributeError when
+        # Django attempts to call storage methods from model fields.
+        try:
+            from storages.backends.s3boto3 import S3Boto3Storage
+            storage_instance = S3Boto3Storage()
+            default_storage._wrapped = storage_instance
+        except Exception:
+            # Fallback: reset wrapped so it'll try to initialize lazily later
+            default_storage._wrapped = None
+            import logging
+            logging.exception("Unable to instantiate S3Boto3Storage; default_storage left unwrapped")
+    except Exception:
+        # ignore import errors at settings load time
+        pass
+
+else:
+    
+    # Development: use local filesystem for media so uploaded images are saved to ./media/
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    # MEDIA_URL and MEDIA_ROOT already set above with sensible defaults
+
+# ================================================ #
