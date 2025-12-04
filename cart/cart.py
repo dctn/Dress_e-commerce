@@ -10,17 +10,24 @@ class Cart:
 
         self.cart = cart
 
-    def add_product(self,product,size,color,qty):
+    def add_product(self,product,size,color,qty,is_stitched):
         product = str(product)
-        if product not in self.cart:
-            self.cart[product] = {
-                'size': size,
-                'color': color,
-                'qty': qty,
-            }
-        else:
-            self.cart[product]['qty'] += qty
 
+        if product not in self.cart:
+            self.cart[product] = []
+
+        for item in self.cart[product]:
+            if item['size'] == size and item['color'] == color and item['is_stitched'] == is_stitched:
+                item['qty'] += qty
+                self.session.modified = True
+                return
+
+        self.cart[product].append({
+            'size': size,
+            'color': color,
+            'qty': qty,
+            'is_stitched': is_stitched,
+        })
         self.session.modified = True
 
     def all_products(self):
@@ -28,21 +35,24 @@ class Cart:
         for product_id,details in self.cart.items():
             product = VariantProduct.objects.get(variant_id=product_id)
             product_price = product.get_price()
-            # product_price = product.discount_price if product.is_discount else product.price
-            items.append({
-                'product': product,
-                'size': details['size'],
-                'color': details['color'],
-                'qty': details['qty'],
-                'product_price': product_price,
-            })
+            for detail in details:
+                items.append({
+                    'product': product,
+                    'size': detail['size'],
+                    'color': detail['color'],
+                    'qty': detail['qty'],
+                    'product_price': product_price,
+                    'is_stitched': detail['is_stitched'],
+                })
         return items
 
     def total_amount(self):
         total = 0
         for item in self.all_products():
-            total += item['product_price'] * item['qty']
-
+            if item['is_stitched'] == "1":
+                total += (item['product_price'] * item['qty']) + 1000
+            else:
+                total += item['product_price'] * item['qty']
         return total
 
     def __len__(self):

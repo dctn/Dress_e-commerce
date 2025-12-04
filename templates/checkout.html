@@ -119,21 +119,21 @@
                                 </div>
 
                                 <!-- Show All Form Errors -->
-{% if form.errors %}
-<div class="alert alert-danger mt-3">
-    <ul class="m-0">
-        {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-                {% if field != '__all__' %}
-                    <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
-                {% else %}
-                    <li>{{ error }}</li>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+                                {% if form.errors %}
+                                    <div class="alert alert-danger mt-3">
+                                        <ul class="m-0">
+                                            {% for field, errors in form.errors.items %}
+                                                {% for error in errors %}
+                                                    {% if field != '__all__' %}
+                                                        <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+                                                    {% else %}
+                                                        <li>{{ error }}</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
 
 
                                 <div class="pt-5 mt-5 pb-5 border-top d-flex justify-content-md-end align-items-center">
@@ -173,9 +173,19 @@
                                                 </a>
                                             </h6>
                                             <span class="d-block text-muted fw-bolder text-uppercase fs-9">Size: {{ item.size }} / Qty: {{ item.qty }}</span>
+                                            {% if item.is_stitched == '1' %}
+                                                <span class="d-block text-muted fw-bolder text-uppercase fs-9">stitched</span>
+                                            {% else %}
+                                                <span class="d-block text-muted fw-bolder text-uppercase fs-9">unstitched</span>
+                                            {% endif %}
                                         </div>
-                                        <p class="fw-bolder text-end text-muted m-0">
-                                            ₹ {{ item.product_price|multiply:item.qty }}</p>
+                                        {% if item.is_stitched == '0' %}
+                                            <p class="fw-bolder text-end text-muted m-0">
+                                                ₹{{ item.product_price|multiply:item.qty }}</p>
+                                        {% else %}
+                                            <p class="fw-bolder text-end text-muted m-0">
+                                                ₹{{ item.product_price|multiply:item.qty|add:1000 }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <!-- / Cart Item-->

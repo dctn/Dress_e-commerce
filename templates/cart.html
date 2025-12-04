@@ -29,35 +29,51 @@
                         <div class="mt-5">
                             <h3 class="fs-5 fw-bolder mb-0 border-bottom pb-4">Your Cart</h3>
                             <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <tbody class="border-0">
+                                {% if cart %}
+                                    <table class="table align-middle">
+                                        <tbody class="border-0">
 
-                                    <!-- Cart Item-->
-                                    {% for item in cart %}
-                                        <div class="row mx-0 py-4 g-0 border-bottom">
-                                            <div class="col-2 position-relative">
-                                                <picture class="d-block border">
-                                                    <img class="img-fluid" src="{{ item.product.image_1.url }}"
-                                                         alt="{{ item.product.base_product.name }}">
-                                                </picture>
-                                            </div>
-                                            <div class="col-9 offset-1">
-                                                <div>
-                                                    <h6 class="justify-content-between d-flex align-items-start mb-2">
-                                                        {{ item.product.base_product.name }}
-                                                        <a href="{% url 'remove_cart' item.product.variant_id %}" style="text-decoration: none"><i class="ri-close-line ms-3"></i></a>
-                                                    </h6>
-                                                    <span class="d-block text-muted fw-bolder text-uppercase fs-9">Size: {{ item.size }} / Qty: {{ item.qty }}</span>
+                                        <!-- Cart Item-->
+                                        {% for item in cart %}
+                                            <div class="row mx-0 py-4 g-0 border-bottom">
+                                                <div class="col-2 position-relative">
+                                                    <picture class="d-block border">
+                                                        <img class="img-fluid" src="{{ item.product.image_1.url }}"
+                                                             alt="{{ item.product.base_product.name }}">
+                                                    </picture>
                                                 </div>
-                                                <p class="fw-bolder text-end text-muted m-0">
-                                                    ₹{{ item.product_price|multiply:item.qty }}</p>
+                                                <div class="col-9 offset-1">
+                                                    <div>
+                                                        <h6 class="justify-content-between d-flex align-items-start mb-2">
+                                                            {{ item.product.base_product.name }}
+                                                            <a href="{% url 'remove_cart' item.product.variant_id %}"
+                                                               style="text-decoration: none"><i
+                                                                    class="ri-close-line ms-3"></i></a>
+                                                        </h6>
+                                                        <span class="d-block text-muted fw-bolder text-uppercase fs-9">Size: {{ item.size }} / Qty: {{ item.qty }}</span>
+                                                        {% if item.is_stitched == '1' %}
+                                                            <span class="d-block text-muted fw-bolder text-uppercase fs-9">stitched</span>
+                                                        {% else %}
+                                                            <span class="d-block text-muted fw-bolder text-uppercase fs-9">unstitched</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    {% if item.is_stitched == '0' %}
+                                                        <p class="fw-bolder text-end text-muted m-0">
+                                                            ₹{{ item.product_price|multiply:item.qty }}</p>
+                                                    {% else %}
+                                                        <p class="fw-bolder text-end text-muted m-0">
+                                                            ₹{{ item.product_price|multiply:item.qty|add:1000 }}</p>
+                                                    {% endif %}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <!-- / Cart Item-->
-                                    {% endfor %}
+                                            <!-- / Cart Item-->
+                                        {% endfor %}
 
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <h2>Nothing Present your cart</h2>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -68,19 +84,21 @@
                             <div class="d-flex flex-column flex-md-row justify-content-md-between mb-4 mb-md-2">
                                 <div>
                                     <p class="m-0 fw-bold fs-5">Grand Total</p>
-                                    <span class="text-muted small">Inc ₹45.89 sales tax</span>
+                                    {#                                    <span class="text-muted small">Inc ₹45.89 sales tax</span>#}
                                 </div>
                                 <p class="m-0 fs-5 fw-bold">₹{{ total }}</p>
                             </div>
                         </div>
-                        <div class="py-4">
-                            <div class="input-group mb-0">
-                                <input type="text" class="form-control" placeholder="Enter coupon code">
-                                <button class="btn btn-secondary btn-sm px-4">Apply</button>
-                            </div>
-                        </div>
+                        {#                        <div class="py-4">#}
+                        {#                            <div class="input-group mb-0">#}
+                        {#                                <input type="text" class="form-control" placeholder="Enter coupon code">#}
+                        {#                                <button class="btn btn-secondary btn-sm px-4">Apply</button>#}
+                        {#                            </div>#}
+                        {#                        </div>#}
+                        {% if cart %}
                         <a href="{% url 'checkout' %}" class="btn btn-dark w-100 text-center" role="button">Proceed to
                             checkout</a></div>
+                    {% endif %}
                 </div>
             </div>
         </div>

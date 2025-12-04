@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .order-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .order {
+            background: #fff;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .order:hover {
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .order-header span {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .order-items {
+            display: none;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .order-items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-items th, .order-items td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-items th {
+            background: #f9f9f9;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    {% include 'includes/nav.html' %}
+
+    <h1>My Orders</h1>
+
+    <div class="order-container">
+
+        {% for order in orders %}
+            <!-- Order 1 -->
+            <div class="order" onclick="toggleOrder(this)">
+                <div class="order-header">
+                    <h3>Tracking ID: {{ order.razorpay_order_id }}</h3>
+                    <span>₹{{ order.total }}</span>
+                </div>
+                <div class="order-items">
+                    <table>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Color</th>
+                            <th>Size</th>
+                            <th>Stitched</th>
+                            <th>Status</th>
+                        </tr>
+                        {% for item in order.orderitem_set.all %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.price_at_purchase }}</td>
+                                <td>{{ item.color }}</td>
+                                <td>{{ item.size }}</td>
+                                <td>{{ item.is_stitched }}</td>
+                                <td>
+                                    {% if order.status == "pending" %}
+                                        <span style="color: green;">pending</span>
+
+                                    {% elif order.status == "packed" %}
+                                        <span style="color: blue;">packed</span>
+
+                                    {% elif order.status == "shipped" %}
+                                        <span style="color: red;">shipped</span>
+
+                                    {% elif order.status == "delivered" %}
+                                        <span style="color: orange;">delivered</span>
+
+                                    {% else %}
+                                        <span>Unknown</span>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+
+
+    </div>
+
+    <script>
+        function toggleOrder(orderElement) {
+            const items = orderElement.querySelector('.order-items');
+            if (items.style.display === 'block') {
+                items.style.display = 'none';
+            } else {
+                items.style.display = 'block';
+            }
+        }
+    </script>
+{% endblock %}

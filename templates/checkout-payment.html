@@ -28,7 +28,8 @@
                                 <li class="me-4"><a class="nav-link-checkout "
                                                     href="{% url 'cart' %}">Your Cart</a></li>
                                 <li class="me-4"><a class="nav-link-checkout "
-                                                    href="{% url 'update_address' order.shipping_address.pk %}">Information</a></li>
+                                                    href="{% url 'update_address' order.shipping_address.pk %}">Information</a>
+                                </li>
 
 
                             </ul>
@@ -95,7 +96,9 @@
 
                             <div class="pt-5 mt-5 pb-5 border-top d-flex flex-column flex-md-row justify-content-between align-items-center">
 
-                                <button id="rzp-button1" class="btn btn-dark w-100 w-md-auto" role="button">Complete Order</button>
+                                <button id="rzp-button1" class="btn btn-dark w-100 w-md-auto" role="button">Complete
+                                    Order
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -124,10 +127,20 @@
                                                     <i class="ri-close-line ms-3"></i>
                                                 </a>
                                             </h6>
+                                            {% if item.is_stitched == '1' %}
+                                                <span class="d-block text-muted fw-bolder text-uppercase fs-9">stitched</span>
+                                            {% else %}
+                                                <span class="d-block text-muted fw-bolder text-uppercase fs-9">unstitched</span>
+                                            {% endif %}
                                             <span class="d-block text-muted fw-bolder text-uppercase fs-9">Size: {{ item.size }} / Qty: {{ item.qty }}</span>
                                         </div>
-                                        <p class="fw-bolder text-end text-muted m-0">
-                                            ₹{{ item.product_price|multiply:item.qty }}</p>
+                                        {% if item.is_stitched == '0' %}
+                                            <p class="fw-bolder text-end text-muted m-0">
+                                                ₹{{ item.product_price|multiply:item.qty }}</p>
+                                        {% else %}
+                                            <p class="fw-bolder text-end text-muted m-0">
+                                                ₹{{ item.product_price|multiply:item.qty|add:1000 }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <!-- / Cart Item-->
@@ -171,45 +184,45 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-    document.getElementById("rzp-button1").addEventListener("click", async function (e) {
-        e.preventDefault();
+        document.getElementById("rzp-button1").addEventListener("click", async function (e) {
+            e.preventDefault();
 
-        let response = await fetch("{% url 'process_order' order.pk %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}", // Only if CSRF is required
-                "Content-Type": "application/json"
-            }
+            let response = await fetch("{% url 'process_order' order.pk %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}", // Only if CSRF is required
+                    "Content-Type": "application/json"
+                }
+            });
+
+            let data = await response.json();
+
+            var options = {
+                "key": data.razorpay_key_id,
+                "amount": data.amount,
+                "currency": "INR",
+                "name": "Dress",
+                "description": "Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": data.order_id,
+                "callback_url": data.callback_url,
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+
+            rzp1.on('payment.failed', function (response) {
+                alert("Payment failed: " + response.error.description);
+            });
+
+            rzp1.open();
         });
-
-        let data = await response.json();
-
-        var options = {
-            "key": data.razorpay_key_id,
-            "amount": data.amount,
-            "currency": "INR",
-            "name": "Dress",
-            "description": "Transaction",
-            "image": "https://example.com/your_logo",
-            "order_id": data.order_id,
-            "callback_url": data.callback_url,
-            "notes": {
-                "address": "Razorpay Corporate Office"
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        };
-
-        var rzp1 = new Razorpay(options);
-
-        rzp1.on('payment.failed', function (response) {
-            alert("Payment failed: " + response.error.description);
-        });
-
-        rzp1.open();
-    });
-</script>
+    </script>
 
 
 {% endblock %}

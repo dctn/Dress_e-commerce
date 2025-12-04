@@ -14,10 +14,13 @@ def add_cart(request):
         product_id = request.POST.get("product_id")
         size = request.POST.get("product_size")
         color = request.POST.get("product_color")
+        is_stitched = request.POST.get("is_stitched")
         cart.add_product(product=product_id,
                          size=size,
                          color=color,
-                         qty=qty)
+                         qty=qty,
+                         is_stitched=is_stitched)
+        print(is_stitched)
         return JsonResponse({"message": "success"})
     return None
 

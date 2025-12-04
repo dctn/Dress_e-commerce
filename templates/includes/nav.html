@@ -6,7 +6,7 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap">
 
                 <!-- Logo-->
-                <a class="navbar-brand fw-bold fs-3 m-0 p-0 flex-shrink-0 order-0" href="./index.html">
+                <a class="navbar-brand fw-bold fs-3 m-0 p-0 flex-shrink-0 order-0" href="{% url 'index' %}">
                     <div class="d-flex align-items-center">
                         <svg class="f-w-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 77.53 72.26">
                             <path d="M10.43,54.2h0L0,36.13,10.43,18.06,20.86,0H41.72L10.43,54.2Zm67.1-7.83L73,54.2,68.49,62,45,48.47,31.29,72.26H20.86l-5.22-9L52.15,0H62.58l5.21,9L54.06,32.82,77.53,46.37Z"
@@ -85,6 +85,8 @@
                                 type="button">
                             Bag ({{ cart| length }})
                         </button>
+
+                    {% if cart%}
                         <div class="cart-dropdown dropdown-menu">
 
                             <!-- Cart Header-->
@@ -110,12 +112,24 @@
                                             <div>
                                                 <h6 class="justify-content-between d-flex align-items-start mb-2">
                                                     {{ item.product.base_product.name }}
-                                                    <a href="{% url 'remove_cart' item.product.variant_id %}" id="remove_cart" style="text-decoration: none"> <i class="ri-close-line ms-3"></i></a>
+                                                    <a href="{% url 'remove_cart' item.product.variant_id %}"
+                                                       id="remove_cart" style="text-decoration: none"> <i
+                                                            class="ri-close-line ms-3"></i></a>
                                                 </h6>
                                                 <span class="d-block text-muted fw-bolder text-uppercase fs-9">Size: {{ item.size }} / Qty: {{ item.qty }}</span>
+                                                {% if item.is_stitched == '1' %}
+                                                    <span class="d-block text-muted fw-bolder text-uppercase fs-9">stitched</span>
+                                                {% else %}
+                                                    <span class="d-block text-muted fw-bolder text-uppercase fs-9">unstitched</span>
+                                                {% endif %}
                                             </div>
-                                            <p class="fw-bolder text-end text-muted m-0">₹{{ item.product_price|multiply:item.qty }}</p>
-                                        </div>
+                                            {% if item.is_stitched == '0' %}
+                                                <p class="fw-bolder text-end text-muted m-0">
+                                                    ₹{{ item.product_price|multiply:item.qty }}</p>
+                                            {% else %}
+                                                <p class="fw-bolder text-end text-muted m-0">
+                                                    ₹{{ item.product_price|multiply:item.qty|add:1000 }}</p>
+                                            {% endif %}                                        </div>
                                     </div>
                                     <!-- Cart Product-->
                                 {% endfor %}
@@ -128,7 +142,7 @@
                                     <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start mb-4 mb-md-2">
                                         <div>
                                             <p class="m-0 fw-bold fs-5">Grand Total</p>
-{#                                            <span class="text-muted small">Inc $45.89 sales tax</span>#}
+                                            {#                                            <span class="text-muted small">Inc $45.89 sales tax</span>#}
                                         </div>
                                         <p class="m-0 fs-5 fw-bold">${{ total }}</p>
                                     </div>
@@ -136,12 +150,13 @@
                                 <a href="{% url 'cart' %}" class="btn btn-outline-dark w-100 text-center mt-4"
                                    role="button">View
                                     Cart</a>
-                                <a href="{% url 'checkout' %}" class="btn btn-dark w-100 text-center mt-2" role="button">Proceed
+                                <a href="{% url 'checkout' %}" class="btn btn-dark w-100 text-center mt-2"
+                                   role="button">Proceed
                                     To Checkout</a>
                             </div>
                             <!-- / Cart Summary-->
                         </div>
-
+                    {% endif %}
 
                     </li>
                     <!-- /Navbar Cart Icon-->
@@ -156,9 +171,7 @@
                     <!-- Menu-->
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown dropdown position-static">
-                            <a class="nav-link dropdown-toggle" href="{% url 'index' %}" role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="{% url 'index' %}">
                                 Home
                             </a>
                         </li>
@@ -171,18 +184,18 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'products' %}">Tops</a></li>
-                                <li><a class="dropdown-item" href="./category.html">Bottoms</a></li>
-                                <li><a class="dropdown-item" href="./category.html">Jeans</a></li>
-                                <li><a class="dropdown-item" href="./category.html">T-Shirts</a></li>
-                                <li><a class="dropdown-item" href="./category.html">Shoes</a></li>
-                                <li><a class="dropdown-item" href="./category.html">Accessories</a></li>
+                                <li><a class="dropdown-item" href="{% url 'products' %}">Bottoms</a></li>
+                                <li><a class="dropdown-item" href="{% url 'products' %}">Jeans</a></li>
+                                <li><a class="dropdown-item" href="{% url 'products' %}">T-Shirts</a></li>
+                                <li><a class="dropdown-item" href="{% url 'products' %}">Shoes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'products' %}">Accessories</a></li>
                             </ul>
                         </li>
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./category.html" role="button">
-                                About us
+                            <a class="nav-link" href="{% url 'order_page' %}" role="button">
+                                Your Orders
                             </a>
                         </li>
 
@@ -192,23 +205,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                Pages
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="./index.html">Homepage</a></li>
-                                <li><a class="dropdown-item" href="./category.html">Category</a></li>
-                                <li><a class="dropdown-item" href="./product.html">Product</a></li>
-                                <li><a class="dropdown-item" href="./cart.html">Cart</a></li>
-                                <li><a class="dropdown-item" href="./checkout.html">Checkout</a></li>
-                                <li><a class="dropdown-item" href="./login.html">Login</a></li>
-                                <li><a class="dropdown-item" href="./register.html">Register</a></li>
-                                <li><a class="dropdown-item" href="./forgotten-password.html">Forgotten Password</a>
-                                </li>
-                            </ul>
-                        </li>
+
 
                         <!-- Navbar Login-->
                         {% if request.user.is_authenticated %}

@@ -12,7 +12,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ("variant_product", "is_fixed_price", "price_at_purchase", "quantity")
+    list_display = ("variant_product", "is_fixed_price", "price_at_purchase", "quantity","is_stitched")
 
     def variant_product(self, obj):
         return obj.variant_id.base_product.name

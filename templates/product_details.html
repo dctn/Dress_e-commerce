@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Products | RedStore</title>
+    <title>{{ product.base_product.name }}</title>
     <link rel="stylesheet" href="{% static 'product_details.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
@@ -78,7 +78,7 @@
         </div>
         <div class="col-2">
             <p>Home / T-Shirt</p>
-                <h1 class="product-title" style="word-wrap: break-word">{{ product.base_product.name }}</h1>
+            <h1 class="product-title" style="word-wrap: break-word">{{ product.base_product.name }}</h1>
 
             {% for tag in product.tag.all %}
                 <a href="{% url 'products_filter_tag' tag.name %}" class="page-btn"
@@ -104,8 +104,19 @@
                 <option>S</option>
             </select>
 
-            {% if product.stock != 0 %}
-                <input type="number" value="1" min="1" max="{{ product.stock }}" id="qtyInput">
+            <div style="display: flex; align-items: center">
+                <input type="checkbox" class="form-check-input" id="stitched_option" style="width: 20px;">
+                <label class="form-check-label" style="font-weight: bold" for="stitched_option" >Stitched (extra: ₹1000)</label>
+            </div>
+
+            {% if product.stock >= 0 %}
+                {% if product.price_per_inches %}
+                    <input type="number" value="25" min="25" max="{{ product.stock }}" id="qtyInput"
+                           style="width: 70px;">
+                {% else %}
+                    <input type="number" value="1" min="1" max="{{ product.stock }}" id="qtyInput"
+                           style="width: 70px;">
+                {% endif %}
                 <button class="btn" id="add_cart">Add To Cart</button>
             {% else %}
                 <h4 class="" style="color: red">Sold out</h4>
@@ -144,8 +155,8 @@
                         {% if product.price %}
                             {% if product.is_discount %}
                                 <h3 class="mt-2 mb-0 small">
-                                <s class="text-muted">₹{{ product.price }}</s>
-                                <span class="text-danger">₹{{ product.discount_price }}</span>
+                                    <s class="text-muted">₹{{ product.price }}</s>
+                                    <span class="text-danger">₹{{ product.discount_price }}</span>
                                 </h3>
                             {% else %}
                                 <h3 class="text-danger">₹{{ product.price }}</h3>
@@ -239,6 +250,7 @@
 
 </script>
 
+{# values#}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -256,11 +268,46 @@
             }
 
             const total = (basePrice * quantity).toFixed(2);
-            singlePriceElement.innerText = "₹" + total;
+            singlePriceElement.innerText = "Total ₹" + total;
         }
 
         qtyInput.addEventListener("input", updatePrice);
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const qtyInput = document.getElementById("qtyInput");
+        const addToCartBtn = document.getElementById("add_cart");
+
+        const minQty = parseInt(qtyInput.min);
+        const maxQty = parseInt(qtyInput.max);
+
+        addToCartBtn.addEventListener("click", function (e) {
+            const quantity = parseInt(qtyInput.value);
+
+            if (isNaN(quantity)) {
+                alert("Please enter a valid quantity.");
+                e.preventDefault();
+                return;
+            }
+
+            if (quantity < minQty) {
+                alert(`Minimum quantity is ${minQty}`);
+                e.preventDefault();
+                return;
+            }
+
+            if (quantity > maxQty) {
+                alert(`Maximum quantity is ${maxQty}`);
+                e.preventDefault();
+                return;
+            }
+
+
+        });
+    });
+
+
 </script>
 
 {# add to cart #}
@@ -268,7 +315,7 @@
 <script>
     const qtyInput = document.getElementById("qtyInput");
     const product_size = document.getElementById("product_size");
-
+    const stitchedBox = document.getElementById("stitched_option");
 
     $(document).on("click", "#add_cart", function (e) {
         e.preventDefault();
@@ -288,6 +335,7 @@
                 qty: qtyInput.value,
                 product_size: product_size.value,
                 product_color: "{{ product.color.name }}",
+                is_stitched: stitchedBox.checked ? 1 : 0,
                 csrfmiddlewaretoken: "{{ csrf_token }}",
                 action: "post"
             },
@@ -309,6 +357,12 @@
     });
 
 </script>
+
+<script>
+console.log("SCRIPT LOADED");
+$("#add_cart").on("click", () => console.log("BUTTON CLICKED"));
+</script>
+
 
 </body>
 

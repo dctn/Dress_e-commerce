@@ -27,8 +27,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["64.227.177.14","sanjayfashion.com","www.sanjayfashion.com"]
-DJANGO_CSRF_TRUSTED_ORIGINS=["64.227.177.14","https://sanjayfashion.com","https:/www.sanjayfashion.com"]
+ALLOWED_HOSTS = ["64.227.177.14","sanjayfashion.com","www.sanjayfashion.com","127.0.0.1","localhost"]
+DJANGO_CSRF_TRUSTED_ORIGINS=["64.227.177.14","https://sanjayfashion.com","https:/www.sanjayfashion.com","127.0.0.1","localhost"]
 
 # Application definition
 
@@ -174,6 +174,10 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SESSION_COOKIE_AGE = 30 * 60   # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
+
+
 RAZOR_PAY_CALLBACK_URL = "payment_verify"
 
 RAZORPAY_KEY = os.environ.get("RAZORPAY_KEY")
@@ -271,3 +275,4 @@ else:
     # MEDIA_URL and MEDIA_ROOT already set above with sensible defaults
 
 # ================================================ #
+

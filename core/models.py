@@ -40,7 +40,7 @@ class VariantProduct(models.Model):
 
 
     price = models.FloatField(blank=True, null=True)
-    stock = models.IntegerField()
+    stock = models.PositiveIntegerField(default=0)
     sale = models.IntegerField(blank=True, null=True, editable=False,default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

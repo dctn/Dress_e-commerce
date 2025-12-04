@@ -53,12 +53,20 @@ class OrderItem(models.Model):
     variant_id = models.ForeignKey(VariantProduct, on_delete=models.SET_NULL, null=True)
     order_id = models.ForeignKey("Order", on_delete=models.SET_NULL, null=True)
     is_fixed_price = models.BooleanField(default=False)
+    product_name = models.CharField(max_length=255)
     price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
+    is_stitched = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField(default=1)
     size = models.CharField(max_length=100)
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
 
 
+STATUS_CHOICES = [
+    ("pending", "Pending"),
+    ("packed", "packed"),
+    ("shipped", "shipped"),
+    ("delivered", "delivered"),
+]
 
 class Order(models.Model):
     order_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True,primary_key=True)
@@ -69,9 +77,10 @@ class Order(models.Model):
     payment_id = models.CharField(max_length=255, null=True, blank=True)
     razorpay_order_id = models.CharField(max_length=255, null=True, blank=True)
     signature_id = models.CharField(max_length=255, null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
     is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user} {self.payment_id}"
+
