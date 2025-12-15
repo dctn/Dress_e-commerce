@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .policy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .contact {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .contact a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include 'includes/nav.html' %}
+<div class="policy-container">
+    <h1>Contact Us – Sanjay Fashion</h1>
+
+    <p>
+        For order-related queries, refunds, shipping assistance, or general support,
+        please reach out to us using the contact details below.
+    </p>
+
+    <div class="contact-details">
+        <p>
+            <strong>Email:</strong>
+            <a href="mailto:sanjayfashions929@gmail.com">
+                sanjayfashions929@gmail.com
+            </a>
+        </p>
+
+        <p>
+            <strong>Support:</strong>
+            Available for order status, refunds, and policy-related queries
+        </p>
+
+        <p>
+            <strong>Business Hours:</strong>
+            Monday – Saturday, 10:00 AM to 7:00 PM
+        </p>
+
+        <p>
+            <strong>Service Area:</strong>
+            We currently serve customers across India
+        </p>
+    </div>
+
+    <p>
+        We strive to respond to all emails within 24–48 working hours.
+        Thank you for choosing <strong>Sanjay Fashion</strong>.
+    </p>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .policy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .contact {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .contact a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include 'includes/nav.html' %}
+
+  <div class="policy-container">
+    <h1>Privacy Policy – Sanjay Fashion</h1>
+
+    <p>
+        We respect your privacy and are committed to protecting your personal
+        information shared with us.
+    </p>
+
+    <h3>Information We Collect</h3>
+    <ul>
+        <li>Name, phone number, email address, shipping address, and order details</li>
+        <li>
+            Payment details are processed securely through Razorpay.
+            We do not store card or bank information on our servers.
+        </li>
+    </ul>
+
+    <h3>How We Use Your Information</h3>
+    <ul>
+        <li>To process and fulfill orders</li>
+        <li>To provide delivery and order status updates</li>
+        <li>To improve our products, services, and customer experience</li>
+    </ul>
+
+    <p>
+        We never sell, trade, or share your personal information with third parties,
+        except trusted logistics partners and payment gateways required to complete
+        your order.
+    </p>
+
+    <p class="contact">
+        For any privacy-related concerns, please email us at
+        <a href="mailto:sanjayfashions929@gmail.com">sanjayfashions929@gmail.com</a>
+    </p>
+</div>
+
+{% endblock %}

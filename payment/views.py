@@ -1,6 +1,8 @@
 import os
 
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.urls import reverse
@@ -139,7 +141,7 @@ def payment_verify(request):
 
     return render(request, "payment_verify.html", {"status": "Invalid Request"})
 
-
+@login_required
 def order_page(request):
     orders = Order.objects.filter(user=request.user, is_paid=True)
     context = {
@@ -149,17 +151,21 @@ def order_page(request):
 
 
 def admin_order(request):
-    status_filter = request.GET.get('status')
-    if status_filter in ["pending", "packed", "shipped", "delivered"]:
-        orders = Order.objects.filter(status=status_filter).order_by('-created_at')
+    if request.user.is_superuser:
+        status_filter = request.GET.get('status')
+        if status_filter in ["pending", "packed", "shipped", "delivered"]:
+            orders = Order.objects.filter(status=status_filter).order_by('-created_at')
+        else:
+            orders = Order.objects.all().order_by('-created_at')
+
+        context = {
+            "orders": orders,
+        }
+
+        return render(request, "admin_order.html",context)
     else:
-        orders = Order.objects.all().order_by('-created_at')
-
-    context = {
-        "orders": orders,
-    }
-
-    return render(request, "admin_order.html",context)
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect("index")
 
 def update_order_status(request, order_id):
     order = get_object_or_404(Order, order_id=order_id)

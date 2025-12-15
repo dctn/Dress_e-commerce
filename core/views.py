@@ -42,3 +42,23 @@ def product_details(request,id):
         'related_base_product': related_base_product,
     }
     return render(request,"product_details.html",context)
+
+
+def cancel_refund(request):
+    return render(request,"details_page/cancel_refund.html")
+
+def terms_and_conditions(request):
+    return render(request,"details_page/Terms_Conditions.html")
+
+
+def shipping_policy(request):
+    return render(request,"details_page/shipping_policy.html")
+
+def privacy_policy(request):
+    return render(request,"details_page/privacy_policy.html")
+
+
+def contact(request):
+    return render(request,"details_page/contact.html")
+
+

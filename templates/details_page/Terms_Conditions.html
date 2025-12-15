@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .policy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .contact {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .contact a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include 'includes/nav.html' %}
+
+    <div class="policy-container">
+    <h1>Terms &amp; Conditions – Sanjay Fashion</h1>
+
+    <p>
+        By accessing our website
+        <a href="https://sanjayfashion.com" target="_blank">https://sanjayfashion.com</a>,
+        you agree to comply with and be bound by the following terms and conditions.
+    </p>
+
+    <ul>
+        <li>All products displayed on the website are subject to availability.</li>
+        <li>Prices may be changed or updated without prior notice.</li>
+        <li>Payments are collected securely through Razorpay.</li>
+        <li>Users are responsible for providing accurate and complete shipping information.</li>
+        <li>Any misuse of the website or fraudulent activity may result in account termination.</li>
+    </ul>
+
+    <p class="contact">
+        For any questions or concerns, please contact us at
+        <a href="mailto:sanjayfashions929@gmail.com">sanjayfashions929@gmail.com</a>
+    </p>
+</div>
+
+
+{% endblock %}

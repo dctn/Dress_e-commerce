@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .policy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .contact {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .contact a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include 'includes/nav.html' %}
+
+   <div class="policy-container">
+    <h1>Shipping Policy – Sanjay Fashion</h1>
+
+    <p>
+        We ship orders across India and strive to ensure timely and safe delivery
+        of all products.
+    </p>
+
+    <h3>Processing Time</h3>
+    <ul>
+        <li>Orders are dispatched within 1–3 business days.</li>
+    </ul>
+
+    <h3>Delivery Time</h3>
+    <ul>
+        <li>Metro cities: 3–5 days</li>
+        <li>Other locations: 5–9 days</li>
+    </ul>
+
+    <h3>Shipping Charges</h3>
+    <p>
+        Shipping charges are calculated at checkout or may be free above
+        eligible order amounts, if applicable.
+    </p>
+
+    <h3>Tracking</h3>
+    <p>
+        Once your order is shipped, tracking details will be shared via
+        WhatsApp, SMS, or Email.
+    </p>
+
+    <p class="contact">
+        For shipping-related queries, contact us at
+        <a href="mailto:sanjayfashion929@gmail.com">sanjayfashion929@gmail.com</a>
+    </p>
+</div>
+
+
+
+{% endblock %}

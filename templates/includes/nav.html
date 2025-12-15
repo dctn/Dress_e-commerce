@@ -206,6 +206,21 @@
                         </li>
 
 
+                    <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{% url 'products' %}" role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                details
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item text-capitalize" href="{% url 'cancel_refund' %}">cancel and refund</a></li>
+                                <li><a class="dropdown-item text-capitalize" href="{% url 'terms_and_conditions' %}">terms and conditions</a></li>
+                                <li><a class="dropdown-item text-capitalize" href="{% url 'shipping_policy' %}">shipping policy</a></li>
+                                <li><a class="dropdown-item text-capitalize" href="{% url 'privacy_policy' %}">privacy_policy</a></li>
+                                <li><a class="dropdown-item text-capitalize" href="{% url 'contact' %}">contact</a></li>
+                            </ul>
+                        </li>
+
 
                         <!-- Navbar Login-->
                         {% if request.user.is_authenticated %}
