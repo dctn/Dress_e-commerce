@@ -18,15 +18,12 @@ from cashfree_pg.models.create_order_request import CreateOrderRequest
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
 
+from django.db import transaction
 
 
 Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
-Cashfree.XEnvironment = (
-    Cashfree.PRODUCTION
-    if os.environ.get("ENVIRONMENT") == "production"
-    else Cashfree.SANDBOX
-)
+Cashfree.XEnvironment =  Cashfree.SANDBOX
 
 # Create your views here.
 def update_shipping_address(request, shipping_address_id):
@@ -89,6 +86,7 @@ def process_order(request, order_id):
 
     customer = CustomerDetails(
         customer_id=f"user_{request.user.username}",
+        customer_name=request.user.username,
         customer_phone=order.shipping_address.phone_number,
         customer_email=request.user.email
     )
@@ -123,48 +121,95 @@ def process_order(request, order_id):
 def payment_verify(request):
     cashfree_order_id = request.GET.get("order_id")
 
-    if cashfree_order_id:
-        cart = Cart(request)
-
-        response = Cashfree().PGFetchOrder(
-            x_api_version,
-            cashfree_order_id,
-            None
+    # 1️⃣ Validate request
+    if not cashfree_order_id:
+        return render(
+            request,
+            "payment_verify.html",
+            {
+                "status": "Invalid request",
+                "is_success": False,
+            }
         )
+
+    # 2️⃣ Fetch order from DB
+    try:
         order = Order.objects.get(order_id=cashfree_order_id)
+    except Order.DoesNotExist:
+        return render(
+            request,
+            "payment_verify.html",
+            {
+                "status": "Order not found",
+                "is_success": False,
+            }
+        )
 
-        if response.data.order_status == "PAID" and not order.is_paid:
+    # 3️⃣ Fetch order status from Cashfree
+    response = Cashfree().PGFetchOrder(
+        x_api_version,
+        cashfree_order_id,
+        None
+    )
 
-            # Payment verified successfully
-            order.is_paid = True
-            order.razorpay_order_id = response.data.order_id
+    print("Cashfree Response:", response.data)
 
-            order.save()
+    # 4️⃣ HARD BLOCK — payment not completed
+    if response.data.order_status != "PAID":
+        return render(
+            request,
+            "payment_verify.html",
+            {
+                "status": "Payment not completed",
+                "payment_status": response.data.order_status,
+                "order_id": cashfree_order_id,
+                "is_success": False,
+            }
+        )
 
-            items = OrderItem.objects.filter(order_id=order)
+    # 5️⃣ Prevent duplicate processing
+    if order.is_paid:
+        return render(
+            request,
+            "payment_verify.html",
+            {
+                "status": "Payment already verified",
+                "order_id": cashfree_order_id,
+                "is_success": True,
+            }
+        )
 
-            for order_item in items:
-                product = order_item.variant_id
-                for item in cart.all_products():
-                    if item["product"] == product:
-                        product_sold = item["qty"]
+    # 6️⃣ Atomic transaction (CRITICAL)
+    with transaction.atomic():
 
-                if product.sale is None:
-                    product.sale = 0
+        order.is_paid = True
+        order.payment_gateway_order_id = response.data.order_id
+        order.save()
 
-                product.sale += product_sold
-                product.stock -= product_sold
-                product.save()
+        order_items = OrderItem.objects.select_for_update().filter(order_id=order)
 
-            cart.clear()
+        for item in order_items:
+            product = item.variant_id
+            qty = item.quantity
 
-            return render(request, "payment_verify.html",
-                          {"status": "Payment Verified Successfully", "order_id": cashfree_order_id})
-            # return redirect("confirm_order",order_id)
-        else:
-            return render(request, "payment_verify.html", {"status": "Payment verification failed"})
+            product.sale = (product.sale or 0) + qty
+            product.stock -= qty
+            product.save()
 
-    return render(request, "payment_verify.html", {"status": "Invalid Request"})
+    # 7️⃣ Clear cart safely (UX only)
+    Cart(request).clear()
+
+    # 8️⃣ Success response
+    return render(
+        request,
+        "payment_verify.html",
+        {
+            "status": "Payment Verified Successfully",
+            "order_id": cashfree_order_id,
+            "is_success": True,
+        }
+    )
+
 
 @login_required
 def order_page(request):

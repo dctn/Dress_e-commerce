@@ -90,8 +90,14 @@
                 {{ product.base_product.desp|linebreaksbr }}
             </p>
 
-            {% if product.price %}
+            {% if product.price and not product.is_discount %}
                 <h4 id="price">₹{{ product.price }}</h4>
+            {% elif product.is_discount and product.is_discount %}
+                <del>
+                    <h4 id="" style="color: red">₹{{ product.price }}</h4>
+                </del>
+                <h4 id="price">₹{{ product.discount_price }}</h4>
+
             {% elif product.price_per_inches %}
                 <h4 id="price">₹{{ product.price_per_inches }} per inch</h4>
             {% endif %}
@@ -106,7 +112,8 @@
 
             <div style="display: flex; align-items: center">
                 <input type="checkbox" class="form-check-input" id="stitched_option" style="width: 20px;">
-                <label class="form-check-label" style="font-weight: bold" for="stitched_option" >Stitched (extra: ₹1000)</label>
+                <label class="form-check-label" style="font-weight: bold" for="stitched_option">Stitched (extra:
+                    ₹1000)</label>
             </div>
 
             {% if product.stock > 0 %}
@@ -275,92 +282,91 @@
     });
 
 
-
 </script>
 
 {# add to cart #}
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const qtyInput = document.getElementById("qtyInput");
-    const addToCartBtn = document.getElementById("add_cart");
-    const productSize = document.getElementById("product_size");
-    const stitchedBox = document.getElementById("stitched_option");
+        const qtyInput = document.getElementById("qtyInput");
+        const addToCartBtn = document.getElementById("add_cart");
+        const productSize = document.getElementById("product_size");
+        const stitchedBox = document.getElementById("stitched_option");
 
-    // 🚨 If elements not present, stop
-    if (!qtyInput || !addToCartBtn) return;
+        // 🚨 If elements not present, stop
+        if (!qtyInput || !addToCartBtn) return;
 
-    const minQty = parseInt(qtyInput.min || 1);
-    const maxQty = parseInt(qtyInput.max || 0);
+        const minQty = parseInt(qtyInput.min || 1);
+        const maxQty = parseInt(qtyInput.max || 0);
 
-    // ❌ HARD STOP IF STOCK IS 0
-    if (maxQty <= 0) {
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerText = "Out of Stock";
-        return;
-    }
-
-    addToCartBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-
-        const quantity = parseInt(qtyInput.value);
-
-        // Size validation
-        if (productSize && (!productSize.value || productSize.value === "Select Size")) {
-            alert("Please select a size");
+        // ❌ HARD STOP IF STOCK IS 0
+        if (maxQty <= 0) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerText = "Out of Stock";
             return;
         }
 
-        // Quantity validation
-        if (isNaN(quantity)) {
-            alert("Please enter a valid quantity");
-            return;
-        }
+        addToCartBtn.addEventListener("click", function (e) {
+            e.preventDefault();
 
-        if (quantity < minQty) {
-            alert(`Minimum quantity is ${minQty}`);
-            return;
-        }
+            const quantity = parseInt(qtyInput.value);
 
-        if (quantity > maxQty) {
-            alert(`Only ${maxQty} items left in stock`);
-            return;
-        }
-
-        // ✅ AJAX ONLY AFTER ALL CHECKS
-        let $btn = $(this);
-        let originalText = $btn.html();
-
-        $.ajax({
-            type: "POST",
-            url: "{% url 'add_cart' %}",
-            data: {
-                product_id: "{{ product.variant_id }}",
-                qty: quantity,
-                product_size: productSize ? productSize.value : null,
-                product_color: "{{ product.color.name }}",
-                is_stitched: stitchedBox ? (stitchedBox.checked ? 1 : 0) : 0,
-                csrfmiddlewaretoken: "{{ csrf_token }}",
-                action: "post"
-            },
-            success: function () {
-                $("#cart_notice").text("Added to cart!").fadeIn().delay(1000).fadeOut();
-                $btn.html("✔️ Added!");
-                setTimeout(() => $btn.html(originalText), 1500);
-            },
-            error: function () {
-                alert("Something went wrong. Try again.");
+            // Size validation
+            if (productSize && (!productSize.value || productSize.value === "Select Size")) {
+                alert("Please select a size");
+                return;
             }
+
+            // Quantity validation
+            if (isNaN(quantity)) {
+                alert("Please enter a valid quantity");
+                return;
+            }
+
+            if (quantity < minQty) {
+                alert(`Minimum quantity is ${minQty}`);
+                return;
+            }
+
+            if (quantity > maxQty) {
+                alert(`Only ${maxQty} items left in stock`);
+                return;
+            }
+
+            // ✅ AJAX ONLY AFTER ALL CHECKS
+            let $btn = $(this);
+            let originalText = $btn.html();
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'add_cart' %}",
+                data: {
+                    product_id: "{{ product.variant_id }}",
+                    qty: quantity,
+                    product_size: productSize ? productSize.value : null,
+                    product_color: "{{ product.color.name }}",
+                    is_stitched: stitchedBox ? (stitchedBox.checked ? 1 : 0) : 0,
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    action: "post"
+                },
+                success: function () {
+                    $("#cart_notice").text("Added to cart!").fadeIn().delay(1000).fadeOut();
+                    $btn.html("✔️ Added!");
+                    setTimeout(() => $btn.html(originalText), 1500);
+                },
+                error: function () {
+                    alert("Something went wrong. Try again.");
+                }
+            });
         });
     });
-});
 </script>
 
 
 <script>
-console.log("SCRIPT LOADED");
-$("#add_cart").on("click", () => console.log("BUTTON CLICKED"));
+    console.log("SCRIPT LOADED");
+    $("#add_cart").on("click", () => console.log("BUTTON CLICKED"));
 </script>
 
 
