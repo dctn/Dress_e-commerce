@@ -11,9 +11,22 @@ from django.views.decorators.csrf import csrf_exempt
 from core.models import Color
 from payment.forms import ShippingAdressForm
 from payment.models import Order, ShippingAddress, OrderItem
-import razorpay
 from cart.cart import Cart
 
+from cashfree_pg.api_client import Cashfree
+from cashfree_pg.models.create_order_request import CreateOrderRequest
+from cashfree_pg.models.customer_details import CustomerDetails
+from cashfree_pg.models.order_meta import OrderMeta
+
+
+
+Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
+Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
+Cashfree.XEnvironment = (
+    Cashfree.PRODUCTION
+    if os.environ.get("ENVIRONMENT") == "production"
+    else Cashfree.SANDBOX
+)
 
 # Create your views here.
 def update_shipping_address(request, shipping_address_id):
@@ -38,21 +51,16 @@ def payment_page(request, order_id):
     return render(request, "checkout-payment.html", context)
 
 
+x_api_version = "2023-08-01"
+
+
 def process_order(request, order_id):
     cart = Cart(request)
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY, settings.RAZORPAY_SECRET))
     order = Order.objects.get(pk=order_id)
 
     all_products = cart.all_products()
-    total_amount = int(cart.total_amount())  # add delivery charge
+    total_amount = int(cart.total_amount()) + 100  # add delivery charge
 
-    data = {
-        "amount": total_amount * 100,
-        "currency": "INR",
-        "payment_capture": "1"
-    }
-
-    razorpay_order = client.order.create(data)
 
     for item in all_products:
         if item["product"].price:
@@ -72,47 +80,65 @@ def process_order(request, order_id):
         )
 
     if os.environ.get("ENVIRONMENT") == "production":
-        callback_url = request.build_absolute_uri(reverse(settings.RAZOR_PAY_CALLBACK_URL)).replace("http://",
+        callback_url = OrderMeta(
+            return_url=request.build_absolute_uri(reverse(settings.RAZOR_PAY_CALLBACK_URL))+ "?order_id={order_id}".replace("http://",
                                                                                                     "https://")
+        )
     else:
-        callback_url = request.build_absolute_uri(reverse(settings.RAZOR_PAY_CALLBACK_URL))
+        callback_url = OrderMeta(return_url=request.build_absolute_uri(reverse(settings.RAZOR_PAY_CALLBACK_URL))+ "?order_id={order_id}")
 
-    order.razorpay_order_id = razorpay_order["id"]
+    customer = CustomerDetails(
+        customer_id=f"user_{request.user.username}",
+        customer_phone=order.shipping_address.phone_number,
+        customer_email=request.user.email
+    )
+
+    cashfree_order_id = str(order.order_id)
+
+    data = CreateOrderRequest(
+        order_id=cashfree_order_id,
+        order_amount=float(total_amount),  # RUPEES
+        order_currency="INR",
+        customer_details=customer,
+        order_meta=callback_url,
+    )
+
+    response = Cashfree().PGCreateOrder(
+        x_api_version,
+        data,
+        None,
+        None
+    )
+
+    order.razorpay_order_id = response.data.payment_session_id
     order.total = total_amount
     order.save()
-    print(callback_url)
-    return JsonResponse({
-        "order_id": razorpay_order["id"],
-        "razorpay_key_id": settings.RAZORPAY_KEY,
-        "product_name": request.user.username,
-        "amount": razorpay_order["amount"],
-        "callback_url": callback_url,
-    })
 
+
+    return JsonResponse({
+        "payment_session_id": response.data.payment_session_id
+    })
 
 @csrf_exempt
 def payment_verify(request):
-    if "razorpay_signature" in request.POST:
+    cashfree_order_id = request.GET.get("order_id")
+
+    if cashfree_order_id:
         cart = Cart(request)
 
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY, settings.RAZORPAY_SECRET))
+        response = Cashfree().PGFetchOrder(
+            x_api_version,
+            cashfree_order_id,
+            None
+        )
+        order = Order.objects.get(order_id=cashfree_order_id)
 
-        order_id = request.POST.get("razorpay_order_id")
-        razorpay_payment_id = request.POST.get("razorpay_payment_id")
-        razorpay_signature = request.POST.get("razorpay_signature")
-
-        try:
-            client.utility.verify_payment_signature({
-                "razorpay_order_id": order_id,
-                "razorpay_payment_id": razorpay_payment_id,
-                "razorpay_signature": razorpay_signature,
-            })
+        if response.data.order_status == "PAID" and not order.is_paid:
 
             # Payment verified successfully
-            order = Order.objects.get(razorpay_order_id=order_id)
             order.is_paid = True
-            order.payment_id = razorpay_payment_id
-            order.signature_id = razorpay_signature
+            order.razorpay_order_id = response.data.order_id
+
             order.save()
 
             items = OrderItem.objects.filter(order_id=order)
@@ -133,10 +159,9 @@ def payment_verify(request):
             cart.clear()
 
             return render(request, "payment_verify.html",
-                          {"status": "Payment Verified Successfully", "order_id": order_id})
+                          {"status": "Payment Verified Successfully", "order_id": cashfree_order_id})
             # return redirect("confirm_order",order_id)
-        except razorpay.errors.SignatureVerificationError:
-
+        else:
             return render(request, "payment_verify.html", {"status": "Payment verification failed"})
 
     return render(request, "payment_verify.html", {"status": "Invalid Request"})

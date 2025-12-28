@@ -181,48 +181,27 @@
     </section>
     <!-- / Main Section-->
 
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
     <script>
-        document.getElementById("rzp-button1").addEventListener("click", async function (e) {
-            e.preventDefault();
+        const cashfree = Cashfree({mode: "sandbox"});
 
-            let response = await fetch("{% url 'process_order' order.pk %}", {
+        document.getElementById("rzp-button1").addEventListener("click", async () => {
+
+            const res = await fetch("{% url 'process_order' order.order_id  %}", {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}", // Only if CSRF is required
-                    "Content-Type": "application/json"
-                }
+                headers: {"X-CSRFToken": "{{ csrf_token }}"}
             });
 
-            let data = await response.json();
+            const data = await res.json();
 
-            var options = {
-                "key": data.razorpay_key_id,
-                "amount": data.amount,
-                "currency": "INR",
-                "name": "Dress",
-                "description": "Transaction",
-                "image": "https://example.com/your_logo",
-                "order_id": data.order_id,
-                "callback_url": data.callback_url,
-                "notes": {
-                    "address": "Razorpay Corporate Office"
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
-
-            var rzp1 = new Razorpay(options);
-
-            rzp1.on('payment.failed', function (response) {
-                alert("Payment failed: " + response.error.description);
+            cashfree.checkout({
+                paymentSessionId: data.payment_session_id,
+                redirectTarget: "_self"
             });
-
-            rzp1.open();
         });
     </script>
+
 
 
 {% endblock %}

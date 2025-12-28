@@ -7,7 +7,7 @@ from payment.models import *
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("user", "total", "status","is_paid", "created_at")
-    search_fields = ("razorpay_order_id",)  # Enables search by payment ID
+    search_fields = ("order_id",)  # Enables search by payment ID
     list_filter = ("status", "is_paid")  # Optional: filters in sidebar
 
 @admin.register(OrderItem)

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -34,6 +35,7 @@ def remove_cart(request,product_id):
 def cart_view(request):
     return render(request, "cart.html")
 
+@login_required
 def checkout(request):
     if request.method == "POST":
         form = ShippingAdressForm(request.POST)

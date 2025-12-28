@@ -183,6 +183,11 @@ RAZOR_PAY_CALLBACK_URL = "payment_verify"
 RAZORPAY_KEY = os.environ.get("RAZORPAY_KEY")
 RAZORPAY_SECRET = os.environ.get("RAZORPAY_SECRET")
 
+CASHFREE_CLIENT_ID = os.environ.get("CASHFREE_CLIENT_ID")
+CASHFREE_CLIENT_SECRET = os.environ.get("CASHFREE_CLIENT_SECRET")
+CASHFREE_ENV = os.environ.get('CASHFREE_ENV')  # change to PRODUCTION later
+
+
 
 # storage
 
