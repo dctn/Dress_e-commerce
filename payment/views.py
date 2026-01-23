@@ -19,11 +19,17 @@ from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
 
 from django.db import transaction
-
+from dotenv import load_dotenv
+load_dotenv()
 
 Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
 Cashfree.XEnvironment =  Cashfree.SANDBOX
+
+if os.environ.get("ENVIRONMENT") == "production":
+    Cashfree.XClientId = settings.PROD_CASHFREE_CLIENT_ID
+    Cashfree.XClientSecret = settings.PROD_CASHFREE_CLIENT_SECRET
+    Cashfree.XEnvironment = Cashfree.PRODUCTION
 
 # Create your views here.
 def update_shipping_address(request, shipping_address_id):
@@ -53,7 +59,12 @@ x_api_version = "2023-08-01"
 
 def process_order(request, order_id):
     cart = Cart(request)
-    order = Order.objects.get(pk=order_id)
+    order = Order.objects.get(order_id=order_id)
+
+    print("ENVIRONMENT =", os.environ.get("ENVIRONMENT"))
+    print("XClientId =", Cashfree.XClientId)
+    print("XClientSecret =", Cashfree.XClientSecret[:15], "******" if Cashfree.XClientSecret else None)
+    print("XEnvironment =", Cashfree.XEnvironment)
 
     all_products = cart.all_products()
     total_amount = int(cart.total_amount()) + 100  # add delivery charge
@@ -224,9 +235,9 @@ def admin_order(request):
     if request.user.is_superuser:
         status_filter = request.GET.get('status')
         if status_filter in ["pending", "packed", "shipped", "delivered"]:
-            orders = Order.objects.filter(status=status_filter).order_by('-created_at')
+            orders = Order.objects.filter(status=status_filter,is_paid=True).order_by('-created_at')
         else:
-            orders = Order.objects.all().order_by('-created_at')
+            orders = Order.objects.filter(is_paid=True).order_by('-created_at')
 
         context = {
             "orders": orders,

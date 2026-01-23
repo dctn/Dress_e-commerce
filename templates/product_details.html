@@ -120,6 +120,9 @@
                 {% if product.price_per_inches %}
                     <input type="number" value="25" min="25" max="{{ product.stock }}" id="qtyInput"
                            style="width: 70px;">
+                {% elif product.stock < 25 and product.price_per_inches %}
+                    <h4 class="" style="color: red">Sold out</h4>
+
                 {% else %}
                     <input type="number" value="1" min="1" max="{{ product.stock }}" id="qtyInput"
                            style="width: 70px;">
