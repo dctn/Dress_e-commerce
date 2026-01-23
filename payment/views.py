@@ -104,7 +104,7 @@ def process_order(request, order_id):
         customer_email=request.user.email
     )
 
-    cashfree_order_id = uuid.uuid4()
+    cashfree_order_id = str(uuid.uuid4())
 
     data = CreateOrderRequest(
         order_id=cashfree_order_id,
