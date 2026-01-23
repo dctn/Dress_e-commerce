@@ -47,9 +47,15 @@ def update_shipping_address(request, shipping_address_id):
 
 def payment_page(request, order_id):
     order = Order.objects.get(order_id=order_id)
+    env = os.environ.get("ENVIRONMENT")
+    if env == "production":
+        env_ = 'production'
+    else:
+        env_ = 'sandbox'
 
     context = {
         "order": order,
+        "env": env_,
     }
     return render(request, "checkout-payment.html", context)
 
