@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -67,11 +68,6 @@ def process_order(request, order_id):
     cart = Cart(request)
     order = Order.objects.get(order_id=order_id)
 
-    print("ENVIRONMENT =", os.environ.get("ENVIRONMENT"))
-    print("XClientId =", Cashfree.XClientId)
-    print("XClientSecret =", Cashfree.XClientSecret[:15], "******" if Cashfree.XClientSecret else None)
-    print("XEnvironment =", Cashfree.XEnvironment)
-
     all_products = cart.all_products()
     total_amount = int(cart.total_amount()) + 100  # add delivery charge
 
@@ -108,7 +104,7 @@ def process_order(request, order_id):
         customer_email=request.user.email
     )
 
-    cashfree_order_id = str(order.order_id)
+    cashfree_order_id = uuid.uuid4()
 
     data = CreateOrderRequest(
         order_id=cashfree_order_id,
