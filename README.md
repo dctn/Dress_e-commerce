@@ -121,17 +121,6 @@ Tests cover models, views, and form logic. Additional linters (flake8, black) ca
 
 A `Procfile` is included for Heroku deployment.
 
----
-
-## 🖼️ Screenshots
-
-| Home Page | Product Detail | Cart / Checkout |
-|-----------|----------------|-----------------|
-| ![home](docs/screenshots/home.png) | ![product](docs/screenshots/product.png) | ![cart](docs/screenshots/cart.png) |
-
-*Add your own screenshots under `docs/screenshots` to highlight UI.*
-
----
 
 ## 🤝 Contributing
 
