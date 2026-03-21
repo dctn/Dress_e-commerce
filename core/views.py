@@ -7,6 +7,7 @@ def index(request):
     return render(request, 'index.html')
 
 
+
 def products(request,filter=None,category=None):
 
     all_products = VariantProduct.objects.all()
