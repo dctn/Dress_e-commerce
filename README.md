@@ -119,9 +119,6 @@ Tests cover models, views, and form logic. Additional linters (flake8, black) ca
 5. **Set environment variables** securely (SECRET_KEY, DEBUG=False, payment keys).
 6. **Serve static/media** with Nginx or your hosting provider’s mechanisms.
 
-A `Procfile` is included for Heroku deployment.
-
-
 ## 🤝 Contributing
 
 Contributions are very welcome! To contribute:
