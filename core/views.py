@@ -34,13 +34,16 @@ def product_details(request,id):
     product = VariantProduct.objects.get(variant_id=id)
 
     related_base_product = VariantProduct.objects.filter(base_product=product.base_product)
+    related_tag = VariantProduct.objects.filter(tag__in=product.tag.all())
+    related_color = VariantProduct.objects.filter(color=product.color)
+
     # if related_base_product.count() < 4:
     #     related_base_product = VariantProduct.objects.filter(Q(tag__name=product.tag.name)|
     #                                                          Q(color__name =product.color.name))
 
     context = {
         'product': product,
-        'related_base_product': related_base_product,
+        'related_base_product': (related_base_product | related_color | related_tag).distinct(),
     }
     return render(request,"product_details.html",context)
 
