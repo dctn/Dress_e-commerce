@@ -18,7 +18,7 @@ class OrderItemAdmin(admin.ModelAdmin):
         try:
             return obj.product_variant.base_product.name
         except AttributeError:
-            return "No Product"
+            return obj.product_name
 
     variant_product.short_description = "Product"
 
