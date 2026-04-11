@@ -15,7 +15,10 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ("variant_product", "is_fixed_price", "price_at_purchase", "quantity","is_stitched")
 
     def variant_product(self, obj):
-        return obj.variant_id.base_product.name
+        try:
+            return obj.product_variant.base_product.name
+        except AttributeError:
+            return "No Product"
 
     variant_product.short_description = "Product"
 
