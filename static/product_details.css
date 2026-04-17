@@ -58,7 +58,7 @@ p {
 }
 
 .col-2 img {
-    max-width: 100%;
+    max-width: 70%;
     padding: 50px 0;
 }
 
@@ -593,6 +593,10 @@ form a {
     .cart-info p {
         display: none;
     }
+    .col-2 img {
+    max-width: 100%;
+    padding: 50px 0;
+}
 }
 
 /* own css */
